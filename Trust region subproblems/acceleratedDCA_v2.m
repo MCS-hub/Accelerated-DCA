@@ -1,0 +1,84 @@
+function [obj_list,time,x] = acceleratedDCA_v2(A,b,sigma,x0,radius,norm_name,tol,rho,lambda_init,gama,bst_dis)
+
+% moi chi cai dat cho L_inf
+if norm_name ~= "linf"
+    error('invalid norm_name, this norm is not available for a moment...')
+end
+
+obj_list = [];
+obj = objective(A,b,x0);
+obj_list = [obj_list,obj];
+
+time = [0];
+acc_time = 0;
+
+tic
+I = eye(size(A));
+x = x0;
+
+lambda_bar = lambda_init;
+
+while(1)
+    y = (sigma*I-A)*x;
+    z = -(b-y)/sigma;
+    v = project(z,radius,norm_name);
+    d = v - x;
+    ns_d = norm(d)^2;
+    
+    if ns_d < tol^2
+        break
+    end
+   
+    if ns_d < bst_dis
+        %disp('boosting...')
+        D = (A*v+b)'*d/(sigma*ns_d);
+
+        tmp1 = -(radius+v)./d;
+        tmp2 = (radius-v)./d;
+
+        alpha1 = max([tmp1(d>0);tmp2(d<0)]);
+        alpha2 = min([tmp2(d>0);tmp1(d<0)]);
+
+        if alpha1<= -D <= alpha2
+            alpha = -D;
+        elseif alpha1^2 + 2*D*alpha1 <= alpha2^2 + 2*D*alpha2
+            alpha = alpha1;
+        else
+            alpha = alpha2;
+        end
+
+        if alpha >0
+            % Armijo-type line-search
+            lambda = lambda_bar;
+            %disp('Armijo-type line-search...')
+
+            while objective(A,b,v+lambda*d) > objective(A,b,v)-(rho/2)*ns_d*lambda^2 ...
+                    || lambda > alpha2 || lambda < alpha1
+                % decrease lambda
+                lambda = gama*lambda;
+            end
+              
+%             if lambda<alpha
+%                 lambda = 0.;
+%             else
+%                 disp('explored!')
+%             end
+        else
+            lambda = alpha;
+        end
+        
+        x = v + lambda*d;
+    else
+        x = v;
+    end
+    
+    acc_time = acc_time+ toc;
+    time = [time, acc_time];
+    
+    % compute the objective
+    obj = objective(A,b,x);
+    obj_list = [obj_list,obj];
+    
+    tic
+end
+end

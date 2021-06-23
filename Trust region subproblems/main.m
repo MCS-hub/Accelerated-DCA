@@ -14,10 +14,9 @@ for i_count = 1:length(radius_list)
             A = A+B;
             b = randn(N,1);
 
-            radius = 200;
             x0 = randn(N,1);
             norm_name = "linf";
-            tol = 1e-8;
+            tol = 1e-6;
 
             A_max_eig = eigs(A,1,'largestreal');
             sigma = scale*max(1,A_max_eig)+1;
@@ -27,11 +26,11 @@ for i_count = 1:length(radius_list)
 
             disp('accelerated DCA')
             %rho = sigma - A_max_eig;
+            bst_dis = 0.1;
             rho = 1;
-            lambda0 = 0.01;
-            gama = 0.1; % 0.5?
-            xi = 5.;
-            [obj_list_aDCA, time_aDCA, x_aDCA] = acceleratedDCA(A,b,sigma,x0,radius,norm_name,tol,rho,lambda0,gama,xi);
+            lambda0 = 100;
+            gama = 0.5;
+            [obj_list_aDCA, time_aDCA, x_aDCA] = acceleratedDCA_v2(A,b,sigma,x0,radius,norm_name,tol,rho,lambda0,gama,bst_dis);
             
             figure
             min_value = min([obj_list_DCA,obj_list_aDCA]);

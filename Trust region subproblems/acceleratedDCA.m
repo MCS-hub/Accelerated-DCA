@@ -26,6 +26,7 @@ while(1)
     d = v - x;
     ns_d = norm(d)^2;
     
+    disp(ns_d)
     if ns_d < tol^2
         break
     end
@@ -59,23 +60,29 @@ while(1)
             lambda = gama*lambda;
         end
         
-        if lambda == lambda_bar
-            count_success = count_success + 1;
-            if count_success == 2
-                lambda_bar = xi*lambda_bar;
-                count_success = 1;
-                %disp('two consecutive successful trials')
-            end
-        else
-            lambda_bar = lambda;
-            count_success = 0;
-            %disp('fail trail')
-        end
+%         if lambda<alpha
+%             lambda = 0.;
+%         else
+%             disp('explored!')
+%         end
+        
+%         if lambda == lambda_bar
+%             count_success = count_success + 1;
+%             if count_success == 2
+%                 lambda_bar = xi*lambda_bar;
+%                 count_success = 1;
+%                 %disp('two consecutive successful trials')
+%             end
+%         else
+%             lambda_bar = lambda;
+%             count_success = 0;
+%             %disp('fail trail')
+%         end
         
     else
         lambda = alpha;
     end
-    
+
     x = v + lambda*d; 
     
     acc_time = acc_time+ toc;
