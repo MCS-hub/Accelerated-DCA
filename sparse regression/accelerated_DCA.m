@@ -23,6 +23,9 @@ while(1)
     d = beta_tmp - beta;  % boosting direction
     ns_d = norm(d)^2;
     
+    disp('norm beta square')
+    disp(norm(beta_tmp)^2)
+    
     if ns_d < tol^2
         break
     end
@@ -50,6 +53,8 @@ while(1)
         sol = cplexqp(H,f,Aineq,bineq,[],[],lb,ub);
         s = sol(1);
         
+        disp('s')
+        disp(s)
         if s>0
             % Armijo-type line-search
             ls_armijo = ls_armijo_bar;
