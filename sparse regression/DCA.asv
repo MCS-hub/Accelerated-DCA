@@ -1,0 +1,32 @@
+function [objective_list,beta] = DCA(X,y,beta0,alpha,lambda,sigma,r,tol)
+
+objective_list = [];
+time = [0];
+
+A = X'*X;
+b = X'*y;
+
+beta = beta0;
+objective = objective_value(beta,X,y,lambda,alpha);
+objective_list = [objective_list,objective];
+
+pre_beta = beta;
+while true
+    v = gradH(beta,A,alpha,lambda,sigma);
+    z = (b+v/2)/sigma;
+    mu = (lambda*alpha)/(2*sigma);
+    beta = proximal(z,mu,r);
+    
+    objective = objective_value(beta,X,y,lambda,alpha);
+    objective_list = [objective_list,objective];
+    
+    if norm(beta-pre_beta)<tol
+        break
+    end
+    
+    pre_beta = beta;
+end
+
+
+end
+
